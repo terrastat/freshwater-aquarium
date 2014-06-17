@@ -4,6 +4,8 @@
  Created 14.June.2014
  	By Bill Walker
  
+ 
+ 
  Revisions:
  14.06.14  New Program
  
@@ -53,19 +55,19 @@
 
 // initialize the library with the numbers of the interface pins
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
-//
+
+// Temperture Sensor variables
 float tempC;
 float tempF;
 float voltage;
 int reading;
 int tempPin = 0; //Temp sensor plugged analog pin 0
-int phPin = 0; //PH sensor plugged analog pin 1
 int threshTemp = 77; //Alarm Temperature threshold (in F)
-int pinLed = 9; //Digital
+
+int phPin = 0; //PH sensor plugged analog pin 1
+
+
 int state = HIGH;
-//int currSwitch;
-//int prevSwitch = LOW;
-int pinSwitch = 6; //digital
 unsigned long int stateTime=0;
 unsigned long int printTime=0;
 unsigned long int prevTime_1 =2000;
@@ -78,8 +80,6 @@ int secondDisplayedOnLcd = 2;
 
 //------------------------------------------------------------------------------------
 void setup(){
-  pinMode(pinLed, OUTPUT);
-  pinMode(pinSwitch, INPUT);
   lcd.begin(16, 2); // set up the LCD’s number of rows and columns
   Serial.begin(9600);
 }
@@ -178,15 +178,13 @@ void updateScreen(){
    |NFT:00:00T:00.0F|
    ------------------  
    */
-  lcd.setCursor(0,0);
-//  lcd.print("Time:");
   lcd.setCursor(10,0);
   lcd.print("PH:0.0");
 
 //  lcd.setCursor(10,0);
 //  lcd.print(ph);
   lcd.setCursor(0,1);// set the cursor to column 0, line 1 
-  lcd.print("NFT:00:00T:00.0F");
+  lcd.print("NFT 00:00T 00.0F");
   lcd.setCursor(5,1);
   //  lcd.print(feedTime);
   lcd.setCursor(12,1);
