@@ -25,7 +25,7 @@
  	The circuit:
  	* list the components attached to each input
  A0 Temp Sensor D0 n/a         D6 Water Filter Relay D12 LCD Screen
- A1 PH Sensor   D1 n/a         D7 Food Feeder Relay  D13 
+ A1 LED Power   D1 n/a         D7 Food Feeder Relay  D13 
  A2 RTC         D2 LCD Screen  D8 Water Heater Relay           
  A3 RTC         D3 LCD Screen  D9 
  A4 Water level D4 LCD Screen  D10           
@@ -85,6 +85,10 @@ const int MINUTES_IN_HOUR = 60;
 const int SECONDS_IN_MINUTE = 60;
 const int SECONDS_IN_DAY = 86400;
 const int SECONDS_IN_EIGHT_HOURS = 28800;
+#define NUM_FEEDS 2
+const int feedtimes[NUM_FEEDS][3] = {{7, 30, 0}, {18, 30, 0}};
+int next_feed_time[3] = {0,0,0};
+int feed_num = 0;
 
 //------------------------------------------------------------------------------------
 void setup(){
@@ -94,14 +98,21 @@ void setup(){
    pinMode(A2, OUTPUT);
    digitalWrite(A2, LOW);
    Serial.begin(9600);
+   for (size_t i = 0; i<3; i++)
+     next_feed_time[i] = feedtimes[feed_num][i];
    setSyncProvider(RTC.get);
    readClock();
+   for (size_t i = 0; i<3; i++)
+         next_feed_time[i] = feedtimes[feed_num][i];
+   /*
    feedTimeHourDisplay = feedTimeHour1;
    feedTimeMinDisplay = feedTimeMin1;
-   if(hour() > feedTimeHourDisplay /*&& minute() >= feedTimeMinDisplay*/){
+   if(hour() > feedTimeHourDisplay && minute() >= feedTimeMinDisplay){
          feedTimeHourDisplay = feedTimeHour2;
          feedTimeMinDisplay = feedTimeMin2;
    }
+   */
+ 
 }
 //------------------------------------------------------------------------------------
 void loop(){
@@ -170,20 +181,16 @@ void updateScreen(){
   lcd.setCursor(0,0);// set the cursor to column 0, line 0 
   lcd.printf("%02d:%02d:%02d  PH:0.0", hour(), minute(), second());
   lcd.setCursor(0,1);// set the cursor to column 0, line 1 
-  lcd.printf("NFT %02d:%02d  00.0F", feedTimeHourDisplay, feedTimeMinDisplay);
+  lcd.printf("NFT %02d:%02d  00.0F", next_feed_time[0], next_feed_time[1]);
 }
 
 //------------------------------------------------------------------------------------
 void feedTime(){
-     if(hour() == feedTimeHour1 && minute() == feedTimeMin1){
-         feedTimeHourDisplay = feedTimeHour2;
-         feedTimeMinDisplay = feedTimeMin2;
-         
-     }    
-     if(hour() == feedTimeHour2 && minute() == feedTimeMin2){    
-         feedTimeHourDisplay = feedTimeHour1;
-         feedTimeMinDisplay = feedTimeMin1;
-     }      
+     if (hour() == next_feed_time[0]  && minute() == next_feed_time[1] && second() == next_feed_time[2]  ) {
+       // insert code here
+          for (size_t i = 0; i<3; i++)
+             next_feed_time[i] = feedtimes[++feed_num%NUM_FEEDS][i];
+     }
 } 
 
 //End
